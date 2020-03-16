@@ -1,7 +1,8 @@
-package ru.test_task.sklad.util;
+package ru.test_task.sklad.to;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import ru.test_task.sklad.util.Status;
 
 public class Response {
     private Status status;
@@ -31,32 +32,7 @@ public class Response {
         return new Gson().toJson(new Response(status, message));
     }
 
-    public static String jsonResponse(Status status, JsonElement data) {
-        return new Gson().toJson(new Response(status, data));
-    }
-
-    //getters and setters
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public JsonElement getData() {
-        return data;
-    }
-
-    public void setData(JsonElement data) {
-        this.data = data;
+    public static String jsonResponse(Object object, Status status) {
+        return new Gson().toJson(new Response(status, new Gson().toJsonTree(object)));
     }
 }

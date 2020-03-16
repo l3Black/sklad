@@ -10,7 +10,7 @@ import java.util.Objects;
 import static ru.test_task.sklad.util.ValidationUtil.*;
 
 public class ProductService {
-    private ProductDao dao = new ProductDaoJpa();
+    private static ProductDao dao = new ProductDaoJpa();
 
     public Product create(Product product) {
         Objects.requireNonNull(product, "product must not be null");

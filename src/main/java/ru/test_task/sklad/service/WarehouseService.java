@@ -2,25 +2,46 @@ package ru.test_task.sklad.service;
 
 import ru.test_task.sklad.dao.WarehouseDao;
 import ru.test_task.sklad.dao.WarehouseDaoJpa;
+import ru.test_task.sklad.model.Product;
 import ru.test_task.sklad.model.Warehouse;
+import ru.test_task.sklad.to.ProductTo;
 import ru.test_task.sklad.util.exceptions.NotFoundException;
 import ru.test_task.sklad.util.exceptions.OutOfStockException;
 
-import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static ru.test_task.sklad.util.ValidationUtil.checkNew;
 import static ru.test_task.sklad.util.ValidationUtil.checkNotFoundWithId;
 
-/*I know that this will not work.
-I did not find a simple transaction manager and
-simply indicated that it would be good to use transactions*/
-
 public class WarehouseService {
-    WarehouseDao dao = new WarehouseDaoJpa();
-    ProductService productService = new ProductService();
+    private static WarehouseDao dao = new WarehouseDaoJpa();
+    private static ProductService productService = new ProductService();
+
+    public Collection<ProductTo> balance() {
+        Collection<Warehouse> warehouses = dao.getAll();
+        Collection<Product> products = productService.getAll();
+        //quantity of products in all warehouses
+        Map<Long, Integer> productsSum = warehouses.stream()
+                .map(w -> w.getProducts().entrySet())
+                .flatMap(Collection::stream)
+                .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.summingInt(Map.Entry::getValue)));
+
+        return products.stream()
+                .map(p -> new ProductTo(p.getId(), p.getName(), productsSum.get(p.getId())))
+                .collect(Collectors.toList());
+    }
+
+    public Collection<ProductTo> balance(long id) {
+        Warehouse warehouse = get(id);
+        Collection<Product> products = productService.getAll();
+        return products.stream()
+                .filter(p -> warehouse.getProducts().get(p.getId()) != null)
+                .map(p -> new ProductTo(p.getId(), p.getName(), warehouse.getProducts().get(p.getId())))
+                .collect(Collectors.toList());
+    }
 
     public Collection<Warehouse> getAll() {
         return dao.getAll();
@@ -36,8 +57,6 @@ public class WarehouseService {
         return dao.save(warehouse);
     }
 
-    @Transactional
-        //see comment above
     void update(Warehouse warehouse) {
         Objects.requireNonNull(warehouse, "warehouse must not be null");
         checkNotFoundWithId(dao.save(warehouse), warehouse.getId());
@@ -53,18 +72,16 @@ public class WarehouseService {
         checkNotFoundWithId(dao.delete(id), id);
     }
 
-    @Transactional //see comment above
     public void addProduct(long id, long productId, int quantity) {
         Warehouse warehouse = get(id);
         Map<Long, Integer> products = warehouse.getProducts();
         if (products.get(productId) == null) {
             productService.get(productId);
         }
-        products.compute(productId, (k, v) -> v == null ? 0 : v + quantity);
+        products.compute(productId, (k, v) -> v == null ? quantity : v + quantity);
         update(warehouse);
     }
 
-    @Transactional //see comment above
     public void reduceProduct(long id, long productId, int quantity) {
         Warehouse warehouse = get(id);
         Map<Long, Integer> products = warehouse.getProducts();
