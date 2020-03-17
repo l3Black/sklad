@@ -20,8 +20,8 @@ public class Document {
     public String toString() {
         return "Document{" +
                 "type=" + type +
-                ", entranceWarehouseId=" + enterStoreId +
-                ", writeOffWarehouseId=" + writeOffStoreId +
+                ", entranceStoreId=" + enterStoreId +
+                ", writeOffStoreId=" + writeOffStoreId +
                 ", products=" + products +
                 '}';
     }

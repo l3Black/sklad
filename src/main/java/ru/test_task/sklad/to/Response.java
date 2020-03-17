@@ -2,7 +2,6 @@ package ru.test_task.sklad.to;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import ru.test_task.sklad.util.Status;
 
 public class Response {
     private Status status;

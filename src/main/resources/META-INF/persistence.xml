@@ -3,7 +3,7 @@
     <persistence-unit name="ru.test_task.sklad">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>ru.test_task.sklad.model.Product</class>
-        <class>ru.test_task.sklad.model.Warehouse</class>
+        <class>ru.test_task.sklad.model.Store</class>
         <properties>
             <property name="hibernate.show_sql" value="true"/>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>

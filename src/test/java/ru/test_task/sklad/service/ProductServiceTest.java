@@ -1,6 +1,7 @@
 package ru.test_task.sklad.service;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import ru.test_task.sklad.dao.ProductDao;
 import ru.test_task.sklad.dao.ProductDaoJpa;
@@ -11,12 +12,17 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.test_task.sklad.ProductTestData.*;
+import static ru.test_task.sklad.test_data.ProductTestData.*;
 
 public class ProductServiceTest extends AbstractServiceTest {
 
     private ProductService service = new ProductService();
     private ProductDao dao = new ProductDaoJpa();
+
+    @Before
+    public void evictCache() {
+        ProductDaoJpa.getEm().clear();
+    }
 
     @Test
     public void create() {

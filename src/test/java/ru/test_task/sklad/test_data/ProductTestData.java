@@ -1,4 +1,4 @@
-package ru.test_task.sklad;
+package ru.test_task.sklad.test_data;
 
 import ru.test_task.sklad.model.Product;
 

@@ -35,4 +35,8 @@ public class DocumentDaoJpa implements DocumentDao {
         return em.createNamedQuery(DocEntity.GET_BY_TYPE, DocEntity.class)
                 .setParameter("type", type).getResultList();
     }
+
+    public static EntityManager getEm() {
+        return em;
+    }
 }

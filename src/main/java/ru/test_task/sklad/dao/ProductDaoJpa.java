@@ -4,11 +4,10 @@ import ru.test_task.sklad.model.Product;
 
 import javax.persistence.EntityManager;
 import java.util.Collection;
-import java.util.List;
 
 public class ProductDaoJpa implements ProductDao {
 
-    private EntityManager em = EmFactory.factory.createEntityManager();
+    private static final EntityManager em = EmFactory.factory.createEntityManager();
 
     @Override
     public Product save(Product product) {
@@ -35,12 +34,8 @@ public class ProductDaoJpa implements ProductDao {
                 .setParameter("name", name).getResultList();
     }
 
-    @Override
-    public Product get(long id) {
-        List<Product> resList = em.createNamedQuery(Product.GET, Product.class)
-                .setParameter("id", id)
-                .getResultList();
-        return resList.size() == 1 ? resList.get(0) : null;
+    public static EntityManager getEm() {
+        return em;
     }
 
     @Override
@@ -51,5 +46,10 @@ public class ProductDaoJpa implements ProductDao {
                 .executeUpdate();
         em.getTransaction().commit();
         return rows != 0;
+    }
+
+    @Override
+    public Product get(long id) {
+        return em.find(Product.class, id);
     }
 }

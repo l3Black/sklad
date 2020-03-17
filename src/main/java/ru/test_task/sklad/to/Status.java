@@ -1,4 +1,4 @@
-package ru.test_task.sklad.util;
+package ru.test_task.sklad.to;
 
 public enum Status {
     SUCCESS,

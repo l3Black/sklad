@@ -8,6 +8,7 @@ import org.junit.Rule;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
+import ru.test_task.sklad.dao.EmFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -51,7 +52,14 @@ public abstract class AbstractServiceTest {
     }
 
     @Before
+    public void evictCache() {
+
+    }
+
+    @Before
     public void populateDb() {
+        EmFactory.factory.getCache().evictAll();
+
         String aSQLScriptFilePath = "src/main/resources/db/populateDB.sql";
         String pathToProp = "src/test/resources/db.config.properties";
         File prop = new File(pathToProp);

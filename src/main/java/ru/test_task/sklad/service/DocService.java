@@ -15,7 +15,7 @@ import static ru.test_task.sklad.util.ValidationUtil.checkNotFoundWithId;
 
 public class DocService {
     private static DocumentDao dao = new DocumentDaoJpa();
-    private static WarehouseService warehouseService = new WarehouseService();
+    private static StoreService storeService = new StoreService();
 
     public DocEntity get(long id) {
         return checkNotFoundWithId(dao.get(id), id);
@@ -32,20 +32,14 @@ public class DocService {
     public DocEntity apply(Document document) {
         switch (document.getType()) {
             case ENTER:
-                document.getProducts().forEach((k, v) -> {
-                    warehouseService.addProduct(document.getEnterStoreId(), k, v);
-                });
+                storeService.addProducts(document.getEnterStoreId(), document.getProducts());
                 return save(new DocEntity(document));
             case SALE:
-                document.getProducts().forEach((k, v) -> {
-                    warehouseService.reduceProduct(document.getWriteOffStoreId(), k, v);
-                });
+                storeService.reduceProducts(document.getWriteOffStoreId(), document.getProducts());
                 return save(new DocEntity(document));
             case MOVE:
-                document.getProducts().forEach((k, v) -> {
-                    warehouseService.reduceProduct(document.getWriteOffStoreId(), k, v);
-                    warehouseService.addProduct(document.getEnterStoreId(), k, v);
-                });
+                storeService.reduceProducts(document.getWriteOffStoreId(), document.getProducts());
+                storeService.addProducts(document.getEnterStoreId(), document.getProducts());
                 return save(new DocEntity(document));
             default:
                 throw new NotFoundException("unknown document type: " + document.getType());
