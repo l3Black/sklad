@@ -26,7 +26,6 @@ public class StoreTestData extends AbstractServiceTest {
     }
 
     static {
-        //DOMODEDOVO_MAP.put(PRODUCT1.getId(), 0);
         DOMODEDOVO_MAP.put(PRODUCT2.getId(), 2);
         DOMODEDOVO_MAP.put(PRODUCT3.getId(), 1);
         DOMODEDOVO_MAP.put(PRODUCT4.getId(), 3);
@@ -36,7 +35,6 @@ public class StoreTestData extends AbstractServiceTest {
         TROIZK_MAP.put(PRODUCT1.getId(), 13);
         TROIZK_MAP.put(PRODUCT2.getId(), 4);
         TROIZK_MAP.put(PRODUCT3.getId(), 8);
-        //TROIZK_MAP.put(PRODUCT4.getId(), 0);
     }
 
     public static Store addProductExpect(Store w, long productId, int quantity) {
