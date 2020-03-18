@@ -17,17 +17,47 @@ import ru.test_task.sklad.util.exceptions.NotFoundException;
 import ru.test_task.sklad.util.exceptions.OutOfStockException;
 import ru.test_task.sklad.util.exceptions.ProductArgumentException;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.Objects;
+import java.util.Properties;
 
 import static ru.test_task.sklad.to.Response.jsonResponse;
+import static ru.test_task.sklad.util.SqlUtil.initDb;
+import static ru.test_task.sklad.util.SqlUtil.populateDb;
 import static spark.Spark.*;
 
 public class Sklad {
-    private static String jsonType = "application/json";
+    public static final EntityManagerFactory factory;
+    public static final Properties properties = new Properties();
+    private static final String jsonType = "application/json";
 
-    private static ProductService productService = new ProductService();
-    private static StoreService storeService = new StoreService();
-    private static DocService docService = new DocService();
+    private static final ProductService productService;
+    private static final StoreService storeService;
+    private static final DocService docService;
+
+    static {
+        try {
+            properties.load(Objects.requireNonNull(Sklad.class.getClassLoader().getResourceAsStream("db/db.config.properties")));
+        } catch (IOException e) {
+            throw new RuntimeException("failed to load properties", e);
+        }
+        Boolean isInitDb = Boolean.valueOf(properties.getProperty("initDB"));
+        if (isInitDb) {
+            initDb();
+        }
+        Boolean isPopulateDb = Boolean.valueOf(properties.getProperty("populateDB"));
+        if (isPopulateDb) {
+            populateDb();
+        }
+
+        factory = Persistence.createEntityManagerFactory("ru.test_task.sklad");
+        productService = new ProductService();
+        storeService = new StoreService();
+        docService = new DocService();
+    }
 
     public static void main(String[] args) {
         //product controllers

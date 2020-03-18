@@ -1,5 +1,6 @@
 package ru.test_task.sklad.dao;
 
+import ru.test_task.sklad.Sklad;
 import ru.test_task.sklad.model.Product;
 
 import javax.persistence.EntityManager;
@@ -7,7 +8,7 @@ import java.util.Collection;
 
 public class ProductDaoJpa implements ProductDao {
 
-    private static final EntityManager em = EmFactory.factory.createEntityManager();
+    private static final EntityManager em = Sklad.factory.createEntityManager();
 
     @Override
     public Product save(Product product) {

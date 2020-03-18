@@ -1,5 +1,6 @@
 package ru.test_task.sklad.dao;
 
+import ru.test_task.sklad.Sklad;
 import ru.test_task.sklad.model.document.DocEntity;
 import ru.test_task.sklad.model.document.DocType;
 
@@ -8,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class DocumentDaoJpa implements DocumentDao {
-    private static EntityManager em = EmFactory.factory.createEntityManager();
+    private static EntityManager em = Sklad.factory.createEntityManager();
 
     @Override
     public DocEntity save(DocEntity docEntity) {
