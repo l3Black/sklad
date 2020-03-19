@@ -5,15 +5,14 @@ import com.google.gson.JsonSyntaxException;
 import org.slf4j.Logger;
 import ru.test_task.sklad.model.Product;
 import ru.test_task.sklad.model.Store;
-import ru.test_task.sklad.model.document.DocEntity;
 import ru.test_task.sklad.model.document.DocType;
 import ru.test_task.sklad.model.document.Document;
 import ru.test_task.sklad.service.DocService;
 import ru.test_task.sklad.service.ProductService;
 import ru.test_task.sklad.service.StoreService;
+import ru.test_task.sklad.to.DocumentTo;
 import ru.test_task.sklad.to.ProductTo;
 import ru.test_task.sklad.to.Status;
-import ru.test_task.sklad.util.ValidationUtil;
 import ru.test_task.sklad.util.exceptions.NotFoundException;
 import ru.test_task.sklad.util.exceptions.OutOfStockException;
 import ru.test_task.sklad.util.exceptions.ProductArgumentException;
@@ -24,11 +23,14 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static ru.test_task.sklad.to.Response.jsonResponse;
 import static ru.test_task.sklad.util.SqlUtil.initDb;
 import static ru.test_task.sklad.util.SqlUtil.populateDb;
+import static ru.test_task.sklad.util.ValidationUtil.assureIdConsistent;
+import static ru.test_task.sklad.util.ValidationUtil.checkValidProductAttributes;
 import static spark.Spark.*;
 
 public class Sklad {
@@ -63,6 +65,18 @@ public class Sklad {
     }
 
     public static void main(String[] args) {
+
+        if (args.length == 1) {
+            try {
+                int port = Integer.parseInt(args[0]);
+                if (port < 1 || port > 65535) throw new NumberFormatException();
+                port(port);
+            } catch (NumberFormatException e) {
+                log.error("The port must be an integer range from 1 to 65535. " +
+                        "The server is running on port 4567", e);
+            }
+        }
+
         path("/sklad", () -> {
             //product controllers
             path("/products", () -> {
@@ -82,8 +96,8 @@ public class Sklad {
                     res.type(jsonType);
                     res.status(202);
                     Product toUpdate = new Gson().fromJson(req.body(), Product.class);
-                    ValidationUtil.checkValidProductAttributes(toUpdate);
-                    ValidationUtil.assureIdConsistent(toUpdate, Long.parseLong(req.params(":id")));
+                    checkValidProductAttributes(toUpdate);
+                    assureIdConsistent(toUpdate, Long.parseLong(req.params(":id")));
                     productService.update(toUpdate);
                     return jsonResponse(Status.SUCCESS, "updated: " + toUpdate);
                 });
@@ -91,7 +105,7 @@ public class Sklad {
                     res.type(jsonType);
                     res.status(201);
                     Product product = new Gson().fromJson(req.body(), Product.class);
-                    ValidationUtil.checkValidProductAttributes(product);
+                    checkValidProductAttributes(product);
                     Product saved = productService.create(product);
                     return jsonResponse(Status.SUCCESS, "saved: " + saved);
                 });
@@ -186,25 +200,30 @@ public class Sklad {
                     res.type(jsonType);
                     res.status(201);
                     Document document = new Gson().fromJson(req.body(), Document.class);
-                    DocEntity applied = docService.apply(document);
-                    return jsonResponse(Status.SUCCESS, "applied " + applied);
+                    DocumentTo applied = new DocumentTo(docService.apply(document));
+                    return jsonResponse(applied, Status.SUCCESS);
                 });
                 get("/:id", (req, res) -> {
                     res.type(jsonType);
                     res.status(302);
-                    DocEntity document = docService.get(Long.parseLong(req.params(":id")));
+                    DocumentTo document = new DocumentTo(docService.get(Long.parseLong(req.params(":id"))));
                     return jsonResponse(document, Status.SUCCESS);
                 });
                 get("", (req, res) -> {
                     res.type(jsonType);
                     res.status(302);
-                    Collection<DocEntity> documents = docService.getAll();
+                    Collection<DocumentTo> documents = docService.getAll().stream()
+                            .map(DocumentTo::new)
+                            .collect(Collectors.toList());
                     return jsonResponse(documents, Status.SUCCESS);
                 });
                 get("/type/:type", (req, res) -> {
                     res.type(jsonType);
                     res.status(302);
-                    Collection<DocEntity> documents = docService.getByType(DocType.valueOf(req.params(":type").toUpperCase()));
+                    DocType type = DocType.valueOf(req.params(":type").toUpperCase());
+                    Collection<DocumentTo> documents = docService.getByType(type).stream()
+                            .map(DocumentTo::new)
+                            .collect(Collectors.toList());
                     return jsonResponse(documents, Status.SUCCESS);
                 });
             });

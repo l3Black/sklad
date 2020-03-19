@@ -19,6 +19,9 @@ public class ProductServiceTest extends AbstractServiceTest {
     private ProductService service = new ProductService();
     private ProductDao dao = new ProductDaoJpa();
 
+    // It is necessary to clean the entity manager,
+    // because the database is filled with test data
+    // before each test, which he does not know about.
     @Before
     public void evictCache() {
         ProductDaoJpa.getEm().clear();

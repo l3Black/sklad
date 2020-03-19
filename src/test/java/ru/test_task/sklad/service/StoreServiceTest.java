@@ -19,6 +19,9 @@ public class StoreServiceTest extends AbstractServiceTest {
     StoreService service = new StoreService();
     StoreDao dao = new StoreDaoJpa();
 
+    // It is necessary to clean the entity manager,
+    // because the database is filled with test data
+    // before each test, which he does not know about.
     @Before
     public void evictCache() {
         StoreDaoJpa.getEm().clear();

@@ -14,6 +14,9 @@ import static ru.test_task.sklad.test_data.DocTestData.*;
 public class DocServiceTest extends AbstractServiceTest {
     DocService docService = new DocService();
 
+    // It is necessary to clean the entity manager,
+    // because the database is filled with test data
+    // before each test, which he does not know about.
     @Before
     public void clearCache() {
         DocumentDaoJpa.getEm().clear();
