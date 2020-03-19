@@ -35,10 +35,6 @@ public class ProductDaoJpa implements ProductDao {
                 .setParameter("name", name).getResultList();
     }
 
-    public static EntityManager getEm() {
-        return em;
-    }
-
     @Override
     public boolean delete(long id) {
         em.getTransaction().begin();
@@ -52,5 +48,9 @@ public class ProductDaoJpa implements ProductDao {
     @Override
     public Product get(long id) {
         return em.find(Product.class, id);
+    }
+
+    public static EntityManager getEm() {
+        return em;
     }
 }

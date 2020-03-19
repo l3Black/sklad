@@ -5,8 +5,6 @@ import ru.test_task.sklad.dao.StoreDaoJpa;
 import ru.test_task.sklad.model.Product;
 import ru.test_task.sklad.model.Store;
 import ru.test_task.sklad.to.ProductTo;
-import ru.test_task.sklad.util.exceptions.NotFoundException;
-import ru.test_task.sklad.util.exceptions.OutOfStockException;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,7 +22,7 @@ public class StoreService {
     public Collection<ProductTo> balance() {
         Collection<Store> stores = dao.getAll();
         Collection<Product> products = productService.getAll();
-        //quantity of products in all stores
+        //amount of products in all stores
         Map<Long, Integer> productsSum = stores.stream()
                 .flatMap(w -> w.getProducts().entrySet().stream())
                 .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.summingInt(Map.Entry::getValue)));
@@ -72,15 +70,7 @@ public class StoreService {
     }
 
     public void addProducts(long id, Map<Long, Integer> addAmount) {
-        Store store = get(id);
-        Map<Long, Integer> products = store.getProducts();
-        addAmount.forEach((prodId, quantity) -> {
-            if (products.get(prodId) == null) {
-                productService.get(prodId);
-            }
-            products.compute(prodId, (k, v) -> v == null ? quantity : v + quantity);
-        });
-        update(store);
+        dao.addProducts(id, addAmount);
     }
 
     public void addProducts(long id, long prodId, int amount) {
@@ -90,24 +80,7 @@ public class StoreService {
     }
 
     public void reduceProducts(long id, Map<Long, Integer> reduceAmount) {
-        Store store = get(id);
-        Map<Long, Integer> products = store.getProducts();
-        reduceAmount.forEach((prodId, quantity) -> {
-            Integer realAmount = products.get(prodId);
-            if (realAmount == null) {
-                throw new NotFoundException("not found productId " + prodId + " in store with Id=" + id);
-            }
-            quantity = Math.abs(quantity);
-            realAmount -= quantity;
-            if (realAmount < 0) {
-                throw new OutOfStockException("Out of stock " + store.getName() + " for productId = " + prodId);
-            } else if (realAmount == 0) {
-                products.remove(prodId);
-            } else {
-                products.put(prodId, realAmount);
-            }
-        });
-        update(store);
+        dao.reduceProducts(id, reduceAmount);
     }
 
     public void reduceProducts(long id, long prodId, int amount) {

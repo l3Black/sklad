@@ -3,6 +3,7 @@ package ru.test_task.sklad.dao;
 import ru.test_task.sklad.model.Store;
 
 import java.util.Collection;
+import java.util.Map;
 
 public interface StoreDao {
     //null if not save
@@ -18,4 +19,8 @@ public interface StoreDao {
 
     //null if not updated
     Store updateName(long id, String name);
+
+    void reduceProducts(long id, Map<Long, Integer> reduceAmount);
+
+    void addProducts(long id, Map<Long, Integer> addAmount);
 }

@@ -57,11 +57,11 @@ public class StoreTestData extends AbstractServiceTest {
         return List.of(STORE_1, STORE_2, STORE_3);
     }
 
-    public static Store getNewWarehouse() {
+    public static Store getNewStore() {
         return new Store(null, "moscow", new LinkedHashMap<>());
     }
 
-    public static Store getUpdatedWarehouse() {
+    public static Store getUpdatedStore() {
         Map<Long, Integer> productsUpd = new LinkedHashMap<>(STORE_2.getProducts());
         productsUpd.put(PRODUCT2.getId(), 12);
         return new Store(STORE_2.getId(), "updated", productsUpd);

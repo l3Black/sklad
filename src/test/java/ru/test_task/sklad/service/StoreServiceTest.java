@@ -43,7 +43,7 @@ public class StoreServiceTest extends AbstractServiceTest {
 
     @Test
     public void create() {
-        Store newStore = getNewWarehouse();
+        Store newStore = getNewStore();
         Store actual = service.create(newStore);
         newStore.setId(actual.getId());
         assertThat(actual).isEqualToComparingFieldByField(newStore);
@@ -51,7 +51,7 @@ public class StoreServiceTest extends AbstractServiceTest {
 
     @Test
     public void update() {
-        Store updated = getUpdatedWarehouse();
+        Store updated = getUpdatedStore();
         service.update(updated);
         assertThat(dao.get(updated.getId())).isEqualToComparingFieldByField(updated);
     }
@@ -94,27 +94,27 @@ public class StoreServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void reduceProduct() {
+    public void reduceProducts() {
         service.reduceProducts(STORE_3.getId(), getProdAmount(PRODUCT1.getId(), 3));
         Store actual = dao.get(STORE_3.getId());
         assertThat(actual).isEqualToComparingFieldByField(reduceProductExpect(STORE_3, PRODUCT1.getId(), 3));
     }
 
     @Test
-    public void removeProduct() {
+    public void removeProducts() {
         service.reduceProducts(STORE_1.getId(), getProdAmount(PRODUCT2.getId(), 2));
         Store actual = dao.get(STORE_1.getId());
         assertThat(actual).isEqualToComparingFieldByField(removeProductExpect(STORE_1, PRODUCT2.getId()));
     }
 
     @Test(expected = OutOfStockException.class)
-    public void reduceProductOutOfStock() {
+    public void reduceProductsOutOfStock() {
         service.reduceProducts(STORE_2.getId(), getProdAmount(PRODUCT4.getId(), 80));
     }
 
 
     @Test(expected = NotFoundException.class)
-    public void reduceUnknownProduct() {
+    public void reduceUnknownProducts() {
         service.reduceProducts(STORE_2.getId(), getProdAmount(PRODUCT1.getId(), 3));
     }
 
@@ -125,5 +125,4 @@ public class StoreServiceTest extends AbstractServiceTest {
         service.updateName(updated.getId(), "newName");
         assertThat(service.get(updated.getId())).isEqualToComparingFieldByField(updated);
     }
-
 }
